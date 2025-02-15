@@ -1,4 +1,3 @@
-const rootUrl= 'https://accounts.google./o/oauth2/v2/outh'
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -11,8 +10,8 @@ const port = process.env.PORT || 4555;
 
 const isProduction = process.env.NODE_ENV === 'production';
 const callbackURL = isProduction
-  ? 'https://elleez.github.io/TuneHub/'  // Correct production URL
-  : 'http://localhost:4555/auth/google/callback';  // Local development URL
+  ? 'https://elleez.github.io/TuneHub/' // Correct production URL
+  : 'http://localhost:4555/auth/google/callback'; // Local development URL
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -21,7 +20,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'default-secret-key',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { secure: isProduction, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 } // Enhanced security
 }));
 
 app.use(passport.initialize());
@@ -41,12 +41,14 @@ passport.use(new GoogleStrategy({
   return done(null, user);
 }));
 
+// Serialize only the user ID to keep session storage minimal
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+// Deserialize user (Ideally fetch from DB)
+passport.deserializeUser((id, done) => {
+  done(null, { id, displayName: "No Name", email: "No Email" });
 });
 
 function isAuthenticated(req, res, next) {
@@ -56,9 +58,9 @@ function isAuthenticated(req, res, next) {
 
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-    res.redirect('/mtv.html');
+    res.redirect('mtv.html');
   } else {
-    res.redirect('/auth/google');
+    res.redirect('auth/google');
   }
 });
 
@@ -67,10 +69,11 @@ app.get('/mtv.html', isAuthenticated, (req, res) => {
 });
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: 'index.html' }),
   (req, res) => {
-    res.redirect('/mtv.html');
+    res.redirect('mtv.html');
   }
 );
 
@@ -86,7 +89,7 @@ app.get('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
     req.session.destroy(() => {
-      res.redirect('/index.html');
+      res.redirect('index.html');
     });
   });
 });
@@ -95,4 +98,6 @@ app.get('/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(4555, '0.0.0.0');
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
