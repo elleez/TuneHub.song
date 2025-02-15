@@ -114,7 +114,7 @@ const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', function () {
         localStorage.removeItem('user');
-        window.location.href = 'newtune.html';
+        window.location.href = 'index.html';
     });
 }
 
