@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PLAYLIST</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="mtv.css">
+  
+  <script>
+    function confirmLogout() {
+      const confirmed = confirm("Are you sure you want to log out?");
+      if (confirmed) {
+        window.location.href = "/logout";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent default navigation
+          confirmLogout();
+        });
+      }
+    });
+  </script>
+</head>
+<div>
+
+    <div class =text>  <h2>SONG PREVIEW</h2> </div>
+
+    <div id="header">
+      <div id="logo-container">
+        <img src="logo.png" alt="TuneHub" class="logo">
+      </div>
+    </div>
+
+
+    <div class="container">
+    <div class="search">
+      <input type="text" id="searchTerm" placeholder="Search for songs or artists">
+    </div>
+
+    <div class="bttn">
+      <button id="searchTermBtn"><i class="fa fa-search"></i></button>
+    </div>
+
+      <div class="playall">
+      <button id="playAllBtn" >Play All</button>
+    </div>
+  </div>
+
+  <div class="profile-container">
+    <a href="#" id="profile-icon" class="profile-icon"><i class="fa-solid fa-user"></i></a>
+  
+    <div class="dropdown-menu" id="dropdown-menu">
+      <div id="profile-info">
+        <div id="logohub">
+          <img src="logo.png" alt="TuneHub Logo" class="logo">
+        </div>
+        <h4 id="welcome-message">Hello, welcome to TuneHub!</h4>
+      </div>
+      <p><strong>User Name:</strong> <span id="user-name">Loading...</span></p>
+      <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
+
+      <button onclick="confirmLogout()">Logout</button>
+    </div>
+  </div>
+  
+
+
+
+  <main id="songs">
+    <!-- Songs will be dynamically displayed here -->
+  </main>
+
+  <script>
+    const userData = localStorage.getItem('user');
+  
+    if (userData) {
+    
+      const user = JSON.parse(userData);
+      document.getElementById("welcome-message").innerHTML = `Hello, welcome to TuneHub, ${user.displayName}!`;
+      document.getElementById("user-name").textContent = user.displayName;
+      document.getElementById("user-email").textContent = user.email;
+    } else {      // Fetch user data from the server if not in local storage
+      fetch('/user')
+        .then(response => response.json())
+        .then(user => {
+          if (user && user.displayName) {
+            // Store user data in local storage for future use
+            localStorage.setItem("user", JSON.stringify(user));
+            
+            // Display user data on the page
+            document.getElementById("welcome-message").textContent = `Hello, welcome to TuneHub, ${user.displayName}!`;
+            document.getElementById("user-name").textContent = user.displayName;
+            document.getElementById("user-email").textContent = user.email;
+          } else {
+            // Redirect to the login page if the user is not authenticated
+            window.location.href = "./index.html";
+          }
+        })
+        .catch(() => {
+          console.error('Error fetching user data');  // Log error in console
+        });
+    }
+  </script>
+  
+
+  <script src="mtv.js"></script>
+</body>
+</html>
