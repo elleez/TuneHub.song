@@ -13,7 +13,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
-<class="background">
+<body class="background">
   <div class="container">
     <img src="logo.png" alt="logo" class="logo">
   </div>
@@ -28,7 +28,7 @@
 
   <div class="wrapper">
     <h1>Login with</h1>
-    <a href="http://localhost:4555/" target="_self">
+    <a href="https://elleez.github.io/TuneHub.song/" target="_self">
       <button class="btngg">
         <i class="bx bxl-google"></i>oogle
       </button>
@@ -37,7 +37,7 @@
 
   <script>
     function handleCredentialResponse(response) {
-      fetch("http://localhost:4555/verify-token", {
+      fetch("https://elleez.github.io/TuneHub.song/verify-token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
